@@ -103,7 +103,7 @@ check_targets_defined_get_targets <- function(net_info){
 
 get_targets <- function(p){
   max_targets_per_category <- 25
-  if (p<15){
+  if (p<25){
     max_targets_per_category <- p
   }
   targets <- lapply(1:max_targets,function(num){
