@@ -1,8 +1,8 @@
-library(tidyverse)
-library(bnlearn)
-library(pcalg)
-library(parallel)
-library(LocalFCI)
+library(tidyverse,quietly=TRUE)
+library(bnlearn,quietly=TRUE)
+library(pcalg,quietly=TRUE)
+library(parallel,quietly=TRUE)
+library(LocalFCI,quietly=TRUE)
 
 # DAG Info -------------------------------------------------------------
 

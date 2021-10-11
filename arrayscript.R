@@ -1,5 +1,5 @@
 start <- Sys.time()
-t0 <- proc.time() # Start Timer
+#t0 <- proc.time() # Start Timer
 #home_dir <- '/home/stephen'
 #home_dir <- '/Users/stephensmith'
 home_dir <- '/u/home/s/stephens'
@@ -106,6 +106,14 @@ results_list <- lapply(1:num_trials,function(num){
 results_total <- data.frame(do.call(rbind,results_list))
 saveRDS(results_total,"results_total.rds")
 
-t1 <- proc.time()
-t2 <- (t1 - t0)[3]
-if(t2 < 300) Sys.sleep(320 - t2)
+#t1 <- proc.time()
+#t2 <- (t1 - t0)[3]
+#if(t2 < 300) Sys.sleep(320 - t2)
+
+end <- Sys.time()
+d <- as.numeric(difftime(end,start,units="sec"))
+if (d < 300){
+    cat("Program finished early. Going to sleep now.\n")
+    Sys.sleep(320-d)
+}
+
