@@ -2,16 +2,17 @@ start <- Sys.time()
 t0 <- proc.time() # Start Timer
 #home_dir <- '/home/stephen'
 #home_dir <- '/Users/stephensmith'
-home_dir <- '/u/home/s/stephens/'
+home_dir <- '/u/home/s/stephens'
 scratch_dir <- '/u/scratch/s/stephens'
 #result_dir <- paste0(home_dir,'/Desktop/','Results-',format(Sys.Date(),"%m-%y"))
-result_dir <- paste0(scratch_dir,'Results-',format(Sys.Date(),"%m-%d-%y"))
+result_dir <- paste0(scratch_dir,'/Results-',format(Sys.Date(),"%m-%d-%y"))
 #rds_dir <- paste0(home_dir,'/Dropbox/Academics/Research/Code/Networks/rds')
 rds_dir <- paste0(home_dir,'/Networks/rds')
 #data_gen_file <- paste0(home_dir,'/Dropbox/Academics/Research/Code/Scripts/data_gen.R')
 data_gen_file <- paste0(home_dir,'/data_gen.R')
 
-source(paste0(home_dir,'/Dropbox/Academics/Research/Code/Scripts/HoffmanArray/helperfunctions.R'))
+#source(paste0(home_dir,'/Dropbox/Academics/Research/Code/Scripts/HoffmanArray/helperfunctions.R'))
+source(paste0(home_dir,'/hoffman/helperfunctions.R'))
 source(data_gen_file)
 
 num_trials <- 5
@@ -41,6 +42,14 @@ net <- sim_vals$net[array_num]
 high <- sim_vals$high[array_num]
 ub <- sim_vals$ub[array_num]
 n <- sim_vals$n[array_num]
+
+cat("This is row",array_num,"of our simulation grid.\n")
+cat("Simulation Parameters:\n")
+cat("Significance:",alpha,"\n")
+cat("Network:",net,"\n")
+cat("high:",high,"\n")
+cat("ub:",ub,"\n")
+cat("n:",n,"\n")
 
 go_to_dir(paste0("alpha=",alpha))
 go_to_dir(net)

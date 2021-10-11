@@ -1,13 +1,21 @@
 #home_dir <- '/home/stephen'
-home_dir <- '/Users/stephensmith'
-data_gen_file <- paste0(home_dir,'/Dropbox/Academics/Research/Code/Scripts/data_gen.R')
-result_dir <- paste0(home_dir,'/Desktop')
-rds_dir <- paste0(home_dir,'/Dropbox/Academics/Research/Code/Networks/rds')
+#home_dir <- '/Users/stephensmith'
+home_dir <- '/u/home/s/stephens/'
+scratch_dir <- '/u/scratch/s/stephens/'
 
-source(paste0(home_dir,'/Dropbox/Academics/Research/Code/Scripts/HoffmanArray/helperfunctions.R'))
+#data_gen_file <- paste0(home_dir,'/Dropbox/Academics/Research/Code/Scripts/data_gen.R')
+data_gen_file <- paste0(home_dir,'data_gen.R')
+#result_dir <- paste0(home_dir,'/Desktop')
+result_dir <- paste0(scratch_dir,'Results-',format(Sys.Date(),"%m-%d-%y"))
+#rds_dir <- paste0(home_dir,'/Dropbox/Academics/Research/Code/Networks/rds')
+rds_dir <- paste0(home_dir,'Networks/rds')
+
+#source(paste0(home_dir,'/Dropbox/Academics/Research/Code/Scripts/HoffmanArray/helperfunctions.R'))
+source(paste0(home_dir,'hoffman/helperfunctions.R'))
 set.seed(555)
 
-## TODO: DOWNLOAD THE MOST RECENT VERSION OF LOCALFCI HERE
+# Download the newest version of the Local FCI package
+devtools::install_github("stephenvsmith/LocalFCI",quiet=TRUE)
 
 alpha <- c(0.01,0.001,0.0001)
 net_names <- gsub(".rds","",list.files(rds_dir))
@@ -19,6 +27,5 @@ n <- c(100,500,1000)
 
 simulation_values <- expand.grid(alpha=alpha,net=net,high=high,ub=ub,n=n)
 
-setwd(result_dir)
-go_to_dir(paste0("Results-",format(Sys.Date(),"%m-%y")))
+go_to_dir(result_dir)
 write.csv(simulation_values,file = "sim_vals.csv")
