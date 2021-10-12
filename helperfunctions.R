@@ -107,8 +107,16 @@ get_targets <- function(p){
     max_targets_per_category <- p
   }
   targets <- lapply(1:max_targets,function(num){
-    target_options <- combn(1:p,num)
-    return(target_options[,sample(1:ncol(target_options),max_targets_per_category)])
+    if (p<500){
+      target_options <- combn(1:p,num)
+      return(target_options[,sample(1:ncol(target_options),max_targets_per_category)])
+    } else {
+      targets <- matrix(nrow = num,ncol = max_targets_per_category)
+      for (j in 1:max_targets_per_category){
+        targets[,j] <- sample(1:p,num)
+      }
+      return(targets)
+    }
   })
   final_target_list <- list()
   final_target_list <- c(final_target_list,targets[[1]]) # Add individual targets
