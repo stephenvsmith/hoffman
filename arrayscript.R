@@ -5,7 +5,7 @@ start <- Sys.time()
 home_dir <- '/u/home/s/stephens'
 scratch_dir <- '/u/scratch/s/stephens'
 #result_dir <- paste0(home_dir,'/Desktop/','Results-',format(Sys.Date(),"%m-%y"))
-result_dir <- paste0(scratch_dir,'/Results-',format(Sys.Date(),"%m-%d-%y"))
+result_dir <- paste0(scratch_dir,'/Results-',format(Sys.Date(),"%m-%y"))
 #rds_dir <- paste0(home_dir,'/Dropbox/Academics/Research/Code/Networks/rds')
 rds_dir <- paste0(home_dir,'/Networks/rds')
 #data_gen_file <- paste0(home_dir,'/Dropbox/Academics/Research/Code/Scripts/data_gen.R')

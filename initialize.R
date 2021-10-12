@@ -6,7 +6,7 @@ scratch_dir <- '/u/scratch/s/stephens/'
 #data_gen_file <- paste0(home_dir,'/Dropbox/Academics/Research/Code/Scripts/data_gen.R')
 data_gen_file <- paste0(home_dir,'data_gen.R')
 #result_dir <- paste0(home_dir,'/Desktop')
-result_dir <- paste0(scratch_dir,'Results-',format(Sys.Date(),"%m-%d-%y"))
+result_dir <- paste0(scratch_dir,'Results-',format(Sys.Date(),"%m-%y"))
 #rds_dir <- paste0(home_dir,'/Dropbox/Academics/Research/Code/Networks/rds')
 rds_dir <- paste0(home_dir,'Networks/rds')
 
