@@ -1,24 +1,32 @@
+### Timing
 start <- Sys.time()
-#t0 <- proc.time() # Start Timer
-#home_dir <- '/home/stephen'
-#home_dir <- '/Users/stephensmith'
+
+# ### Directories (Testing)
+# home_dir <- '/home/stephen'
+# home_dir <- '/Users/stephensmith'
+# result_dir <- paste0(home_dir,'/Desktop/','Results-',format(Sys.Date(),"%m-%y"))
+# rds_dir <- paste0(home_dir,'/Dropbox/Academics/Research/Code/Networks/rds')
+# data_gen_file <- paste0(home_dir,'/Dropbox/Academics/Research/Code/Scripts/data_gen.R')
+
+### Directories (Hoffman)
 home_dir <- '/u/home/s/stephens'
 scratch_dir <- '/u/scratch/s/stephens'
-#result_dir <- paste0(home_dir,'/Desktop/','Results-',format(Sys.Date(),"%m-%y"))
 result_dir <- paste0(scratch_dir,'/Results-',format(Sys.Date(),"%m-%y"))
-#rds_dir <- paste0(home_dir,'/Dropbox/Academics/Research/Code/Networks/rds')
 rds_dir <- paste0(home_dir,'/Networks/rds')
-#data_gen_file <- paste0(home_dir,'/Dropbox/Academics/Research/Code/Scripts/data_gen.R')
 data_gen_file <- paste0(home_dir,'/data_gen.R')
 
-#source(paste0(home_dir,'/Dropbox/Academics/Research/Code/Scripts/HoffmanArray/helperfunctions.R'))
+# ### Setup (Testing)
+# source(paste0(home_dir,'/Dropbox/Academics/Research/Code/Scripts/HoffmanArray/helperfunctions.R'))
+# array_num <- 1
+
+### Setup (Hoffman)
 source(paste0(home_dir,'/hoffman/helperfunctions.R'))
+array_num <- as.numeric(Sys.getenv("SGE_TASK_ID"))
+
 source(data_gen_file)
 
 num_trials <- 5
 max_targets <- 4
-#array_num <- 1
-array_num <- as.numeric(Sys.getenv("SGE_TASK_ID"))
 
 data.grid <- data.frame(network = "asia",
                         data.type = "continuous",
@@ -26,11 +34,11 @@ data.grid <- data.frame(network = "asia",
                         n.obs = 1000,
                         c.ratio = 0,
                         max.in.degree = Inf,
-                        lb = 0.1,  # lower bound of coefficients
+                        lb = 1e-04,  # lower bound of coefficients
                         ub = 5,  # upper bound of coefficients
-                        low = 0.1,  # lower bound of variances if continuous, of number of levels if discrete
+                        low = 1e-04,  # lower bound of variances if continuous, of number of levels if discrete
                         high = 5,  # upper bound of variances if continuous, of number of levels if discrete
-                        scale = TRUE,
+                        scale = FALSE,
                         stringsAsFactors = FALSE)
 
 
@@ -88,7 +96,7 @@ results_list <- lapply(1:num_trials,function(num){
   
   # Run Global PC Algorithm
   results_pc <- run_global_pc(df_list[[num]])
-  
+
   # Run Local FCI Algorithm
   results_df <- mclapply(targets,
                          run_fci_target,
@@ -106,9 +114,6 @@ results_list <- lapply(1:num_trials,function(num){
 results_total <- data.frame(do.call(rbind,results_list))
 saveRDS(results_total,"results_total.rds")
 
-#t1 <- proc.time()
-#t2 <- (t1 - t0)[3]
-#if(t2 < 300) Sys.sleep(320 - t2)
 
 end <- Sys.time()
 d <- as.numeric(difftime(end,start,units="sec"))

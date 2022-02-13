@@ -1,8 +1,8 @@
-library(tidyverse,quietly=TRUE)
-library(bnlearn,quietly=TRUE)
-library(pcalg,quietly=TRUE)
-library(parallel,quietly=TRUE)
-library(LocalFCI,quietly=TRUE)
+library(tidyverse,quietly=TRUE,verbose = FALSE,warn.conflicts = FALSE)
+library(bnlearn,quietly=TRUE,verbose = FALSE,warn.conflicts = FALSE)
+library(pcalg,quietly=TRUE,verbose = FALSE,warn.conflicts = FALSE)
+library(parallel,quietly=TRUE,verbose = FALSE,warn.conflicts = FALSE)
+library(LocalFCI,quietly=TRUE,verbose = FALSE,warn.conflicts = FALSE)
 
 # DAG Info -------------------------------------------------------------
 
@@ -43,7 +43,6 @@ get_network_DAG <- function(net){
 simulation_data_creation <- function(){
   # Check to see if the data has been generated already
   sims_not_created <- check_sims_created(n)
-
   # Generate Data
   if (sims_not_created){
     sims_text_output()
@@ -232,11 +231,12 @@ run_local_fci <- function(t,df,num,results_pc){
   results_pc$time_diff[["Local FCI"]] <- diff
   results_pc$num_tests[["Local FCI"]] <- localfci_result$NumTests
   results <- neighborhood_results(t,localfci_result,results_pc,num)
+  
   return(results)
 }
 
 create_target_directory <- function(t){
-  go_to_dir(paste0("Target",ifelse(length(t)>1,"s",""),"=",paste(t,collapse = ", ")))
+  go_to_dir(paste0("Target",ifelse(length(t)>1,"s",""),"=",paste(t,collapse = ",")))
   return()
 }
 
@@ -245,12 +245,12 @@ create_target_directory <- function(t){
 
 # Compile all results about the simulation
 neighborhood_results <- function(t,localfci_result,pc_results,num){
-  nbhd <- localfci_result$neighborhood + 1
+  nbhd <- localfci_result$Nodes
   # Zoom in on estimated and true DAGs (only the target and first-order neighbors)
   nodes_zoom <- network_info$node_names[nbhd]
   pc_mat <- matrix(pc_results$pc,nrow = network_info$p)[nbhd,nbhd]
   true_neighborhood_graph <- network_info$cpdag[nbhd,nbhd] # CPDAG is Ground Truth
-  localfci_mat <- localfci_result$G[nbhd,nbhd]
+  localfci_mat <- localfci_result$amat[nbhd,nbhd]
   # Compare results
   results <- all_metrics(localfci_mat,
                          true_neighborhood_graph,
@@ -274,13 +274,25 @@ neighborhood_results <- function(t,localfci_result,pc_results,num){
            trial_num=num,
            num_targets=length(t),
            targets=paste(t,collapse = ","),
-           p=network_info$p)
-  
+           p=network_info$p) %>% 
+    mutate(totalSkeletonTime=localfci_result$totalSkeletonTime,
+           targetSkeletonTimes=paste(localfci_result$targetSkeletonTimes,collapse = ","),
+           totalcpptime=localfci_result$totalTime,
+           nodes=paste(localfci_result$Nodes,collapse = ",")
+           )
+
   saveRDS(results,file = paste0("results_df",num,".rds"))
   capture.output(results %>% select(size,num_edges,contains("pc")),
                  file = paste0("results_pc",num,".txt"))
   capture.output(results %>% select(size,num_edges,contains("fci")),
                  file = paste0("results_fci",num,".txt"))
+  
+  write.table(localfci_result$amat,paste0("estAmat",num,".txt"))
+  write.table(localfci_result$referenceDag,"refDAG.txt")
+  saveRDS(localfci_result$S,paste0("SepSet",num,".rds"))
+  saveRDS(localfci_result$mbList,paste0("mbList",num,".rds"))
+  saveRDS(localfci_result$data_means,paste0("dataMeans",num,".rds"))
+  saveRDS(localfci_result$data_cov,paste0("dataCov",num,".rds"))
   
   return(results)
 }
