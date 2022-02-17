@@ -21,9 +21,9 @@ data_gen_file <- paste0(home_dir,'/data_gen.R')
 # 
 # cat("Simulation",array_num,file = "~/Desktop/lastSim.txt")
 
-# ### Setup (Hoffman)
-# source(paste0(home_dir,'/hoffman/helperfunctions.R'))
-# array_num <- as.numeric(Sys.getenv("SGE_TASK_ID"))
+### Setup (Hoffman)
+source(paste0(home_dir,'/hoffman/helperfunctions.R'))
+array_num <- as.numeric(Sys.getenv("SGE_TASK_ID"))
 
 source(data_gen_file)
 
