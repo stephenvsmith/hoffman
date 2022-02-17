@@ -3,7 +3,7 @@ start <- Sys.time()
 
 # ### Directories (Testing)
 # home_dir <- '/home/stephen'
-# home_dir <- '/Users/stephensmith'
+# #home_dir <- '/Users/stephensmith'
 # result_dir <- paste0(home_dir,'/Desktop/','Results-',format(Sys.Date(),"%m-%y"))
 # rds_dir <- paste0(home_dir,'/Dropbox/Academics/Research/Code/Networks/rds')
 # data_gen_file <- paste0(home_dir,'/Dropbox/Academics/Research/Code/Scripts/data_gen.R')
@@ -17,11 +17,13 @@ data_gen_file <- paste0(home_dir,'/data_gen.R')
 
 # ### Setup (Testing)
 # source(paste0(home_dir,'/Dropbox/Academics/Research/Code/Scripts/HoffmanArray/helperfunctions.R'))
-# array_num <- 1
+# array_num <- sample(1:3200,1)
+# 
+# cat("Simulation",array_num,file = "~/Desktop/lastSim.txt")
 
-### Setup (Hoffman)
-source(paste0(home_dir,'/hoffman/helperfunctions.R'))
-array_num <- as.numeric(Sys.getenv("SGE_TASK_ID"))
+# ### Setup (Hoffman)
+# source(paste0(home_dir,'/hoffman/helperfunctions.R'))
+# array_num <- as.numeric(Sys.getenv("SGE_TASK_ID"))
 
 source(data_gen_file)
 

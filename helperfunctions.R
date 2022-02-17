@@ -106,7 +106,7 @@ get_targets <- function(p){
     max_targets_per_category <- p
   }
   targets <- lapply(1:max_targets,function(num){
-    if (p<500){
+    if (p<200){
       target_options <- combn(1:p,num)
       return(target_options[,sample(1:ncol(target_options),max_targets_per_category)])
     } else {
@@ -360,7 +360,7 @@ output_text <- function(t,num){
   q1 <- format(paste("Tolerance:",alpha),width = 20,justify = "centre")
   q2 <- format(paste("Net:",net),width = 25,justify = "centre")
   q2.5 <- format(paste("Sample Size:",data.grid$n.obs),width = 18,justify = "centre")
-  q3 <- format(paste("Target:",t),width = 15,justify = "centre")
+  q3 <- format(paste("Targets:",paste(t,collapse=",")),width = 23,justify = "left")
   q4 <- format(paste("Dataset:",num),width = 15,justify = "centre")
   cat(q1,"|",q2,"|",q2.5,"|",q3,"|",q4,"\n")
 }
