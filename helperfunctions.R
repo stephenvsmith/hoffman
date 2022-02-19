@@ -282,17 +282,20 @@ neighborhood_results <- function(t,localfci_result,pc_results,num){
            )
 
   saveRDS(results,file = paste0("results_df",num,".rds"))
-  capture.output(results %>% select(size,num_edges,contains("pc")),
-                 file = paste0("results_pc",num,".txt"))
-  capture.output(results %>% select(size,num_edges,contains("fci")),
-                 file = paste0("results_fci",num,".txt"))
   
-  write.table(localfci_result$amat,paste0("estAmat",num,".txt"))
-  write.table(localfci_result$referenceDag,"refDAG.txt")
-  saveRDS(localfci_result$S,paste0("SepSet",num,".rds"))
-  saveRDS(localfci_result$mbList,paste0("mbList",num,".rds"))
-  saveRDS(localfci_result$data_means,paste0("dataMeans",num,".rds"))
-  saveRDS(localfci_result$data_cov,paste0("dataCov",num,".rds"))
+  # Testing Diagnostics
+  
+  # capture.output(results %>% select(size,num_edges,contains("pc")),
+  #                file = paste0("results_pc",num,".txt"))
+  # capture.output(results %>% select(size,num_edges,contains("fci")),
+  #                file = paste0("results_fci",num,".txt"))
+  
+  # write.table(localfci_result$amat,paste0("estAmat",num,".txt"))
+  # write.table(localfci_result$referenceDag,"refDAG.txt")
+  # saveRDS(localfci_result$S,paste0("SepSet",num,".rds"))
+  # saveRDS(localfci_result$mbList,paste0("mbList",num,".rds"))
+  # saveRDS(localfci_result$data_means,paste0("dataMeans",num,".rds"))
+  # saveRDS(localfci_result$data_cov,paste0("dataCov",num,".rds"))
   
   return(results)
 }
