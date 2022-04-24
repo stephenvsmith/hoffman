@@ -42,16 +42,19 @@ get_network_DAG <- function(net){
 
 simulation_data_creation <- function(){
   # Check to see if the data has been generated already
+  go_to_dir("data")
   sims_not_created <- check_sims_created(n)
   # Generate Data
   if (sims_not_created){
     sims_text_output()
-    
+
     gdg <- generate.data.grid(data.grid,
                               out.dir=getwd(),
                               verbose=FALSE,
-                              path.start=home_dir)
+                              path.start=home_dir,
+                              array_num = array_num)
   }
+  setwd("..")
 }
 
 # Check whether or not simulations have been created so they do not have to be created again
@@ -78,10 +81,11 @@ sims_text_output <- function(){
 
 # Grab dataframe for network at given sample size
 grab_data <- function(df_num){
-  go_to_dir(paste0(net,"; ","n = ",n,"; c = 0"))
+  go_to_dir("data")
+  go_to_dir(paste0(net,"_",array_num))
   df <- read.table(paste0("data",df_num,".txt"))
   colnames(df) <- network_info$node_names
-  setwd("..")
+  setwd("../..")
   return(df)
 }
 
@@ -89,14 +93,14 @@ grab_data <- function(df_num){
 
 check_targets_defined_get_targets <- function(net_info){
   # Determine whether or not targets have been defined
-  if (!file.exists("targets.rds")){
+  if (!file.exists(paste0("targets_",net,".rds"))){
     targets <- get_targets(net_info$p)
-    saveRDS(targets,"targets.rds")
+    saveRDS(targets,paste0("targets_",net,".rds"))
   } else {
-    targets <- readRDS("targets.rds")
+    targets <- readRDS(paste0("targets_",net,".rds"))
     cat("Targets for",net,"obtained from file.\n")
   }
-
+  
   return(targets)
 }
 
@@ -145,7 +149,7 @@ run_global_pc <- function(df){
   num_tests <- list()
   
   largest_possible_sepset <- 5
-  pc_test_file <- "pc_tests.txt"
+  pc_test_file <- paste0("pc_tests_",array_num,".txt")
   sink(file = pc_test_file)
   start <- Sys.time()
   pc.fit <- as(pc(suffStat = list(C = cor(df), n = n),
@@ -202,8 +206,6 @@ get_pc_test_num <- function(file){
 
 run_fci_target <- function(t,df,num,results_pc,curr_dir){
   output_text(t,num)
-  setwd(curr_dir)
-  vars <- create_target_directory(t)
 
   # Run local FCI
   results <- run_local_fci(t,df,num,results_pc)
@@ -220,7 +222,7 @@ run_local_fci <- function(t,df,num,results_pc){
   results_pc$lmax[["Local FCI"]] <- lmax
   true_dag <- network_info$true_dag
   start <- Sys.time()
-  
+ 
   localfci_result <- localfci_cpp(data=df,
                                        true_dag=as.matrix(true_dag),
                                        targets=t,lmax=lmax,
@@ -245,19 +247,24 @@ create_target_directory <- function(t){
 
 # Compile all results about the simulation
 neighborhood_results <- function(t,localfci_result,pc_results,num){
-  nbhd <- localfci_result$Nodes
+  nbhd <- localfci_result$Nodes # Need to write a function to get the correct neighborhood
   # Zoom in on estimated and true DAGs (only the target and first-order neighbors)
   nodes_zoom <- network_info$node_names[nbhd]
   pc_mat <- matrix(pc_results$pc,nrow = network_info$p)[nbhd,nbhd]
   true_neighborhood_graph <- network_info$cpdag[nbhd,nbhd] # CPDAG is Ground Truth
   localfci_mat <- localfci_result$amat[nbhd,nbhd]
   # Compare results
+  if (length(nbhd)==1){
+    pc_mat <- as.matrix(pc_mat,nrow=1,ncol=1)
+    localfci_mat <- as.matrix(localfci_mat,nrow=1,ncol=1)
+    true_neighborhood_graph <- as.matrix(true_neighborhood_graph,nrow=1,ncol=1)
+  }
   results <- all_metrics(localfci_mat,
                          true_neighborhood_graph,
                          pc_mat,
-                         sapply(t,function(t) {which(nbhd==t)-1}),verbose = FALSE)
+                         sapply(t,function(t) {which(nbhd==t)-1}),verbose = FALSE) # Need to check out the sapply here
   nbhd_metrics <- neighborhood_metrics(true_neighborhood_graph)
-
+  
   results <- cbind(nbhd_metrics,results)
   results <- results %>% 
     mutate(pc_num_tests=pc_results$num_tests[["PC"]],
@@ -266,7 +273,8 @@ neighborhood_results <- function(t,localfci_result,pc_results,num){
            fci_time=pc_results$time_diff[["Local FCI"]]) %>%
     mutate(lmax_pc = pc_results$lmax$PC,
            lmax_fci=pc_results$lmax[["Local FCI"]]) %>% 
-    mutate(alpha=alpha,
+    mutate(sim_number=array_num,
+           alpha=alpha,
            net=net,
            n=n,
            ub=ub,
@@ -279,9 +287,24 @@ neighborhood_results <- function(t,localfci_result,pc_results,num){
            targetSkeletonTimes=paste(localfci_result$targetSkeletonTimes,collapse = ","),
            totalcpptime=localfci_result$totalTime,
            nodes=paste(localfci_result$Nodes,collapse = ",")
-           )
-
-  saveRDS(results,file = paste0("results_df",num,".rds"))
+    )
+  
+  # saveRDS(results,file = paste0("results_df",num,".rds"))
+  
+  # capture.output(results %>% select(size,num_edges,contains("pc")),
+  #                file = paste0("results_pc",num,".txt"))
+  # capture.output(results %>% select(size,num_edges,contains("fci")),
+  #                file = paste0("results_fci",num,".txt"))
+  
+  # write.table(localfci_result$amat,paste0("estAmat",num,".txt"))
+  # write.table(localfci_result$referenceDag,"refDAG.txt")
+  # saveRDS(localfci_result$S,paste0("SepSet",num,".rds"))
+  # saveRDS(localfci_result$mbList,paste0("mbList",num,".rds"))
+  # saveRDS(localfci_result$data_means,paste0("dataMeans",num,".rds"))
+  # saveRDS(localfci_result$data_cov,paste0("dataCov",num,".rds"))
+  
+  # saveRDS(mb_metrics,paste0("mbMetrics",num,".rds"))
+  
   
   # Testing Diagnostics
   
@@ -299,6 +322,7 @@ neighborhood_results <- function(t,localfci_result,pc_results,num){
   
   return(results)
 }
+
 
 # General Functions -------------------------------------------------------
 
